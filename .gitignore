@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.env
+.mypy_cache/
+/elasticsearch/.env
+/init_movies_load/.env
+async_api/.env
+/tests/functional/src/.pytest_cache/
+/tests/.env
+/.idea/
+/auth_api/.env.docker-compose
+/admin/.env.docker-compose

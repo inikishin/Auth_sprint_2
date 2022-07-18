@@ -1,20 +1,36 @@
-# Проектная работа 7 спринта
+# Проектная работа 6 спринта
 
-Упростите регистрацию и аутентификацию пользователей в Auth-сервисе, добавив вход через социальные сервисы. Список сервисов выбирайте исходя из целевой аудитории онлайн-кинотеатра — подумайте, какими социальными сервисами они пользуются. Например, использовать [OAuth от Github](https://docs.github.com/en/free-pro-team@latest/developers/apps/authorizing-oauth-apps){target="_blank"} — не самая удачная идея. Ваши пользователи не разработчики и вряд ли имеют аккаунт на Github. А вот добавить Twitter, Facebook, VK, Google, Yandex или Mail будет хорошей идеей.
+[Ссылка на репозиторий](https://github.com/inikishin/Auth_sprint_1).
 
-Вам не нужно делать фронтенд в этой задаче и реализовывать собственный сервер OAuth. Нужно реализовать протокол со стороны потребителя.
+## Описание сервисов
 
-Информация по OAuth у разных поставщиков данных: 
+Для запуска всех сервисов в корневой директории проекта необходимо ввести команду:
 
-- [Twitter](https://developer.twitter.com/en/docs/authentication/overview){target="_blank"},
-- [Facebook](https://developers.facebook.com/docs/facebook-login/){target="_blank"},
-- [VK](https://vk.com/dev/access_token){target="_blank"},
-- [Google](https://developers.google.com/identity/protocols/oauth2){target="_blank"},
-- [Yandex](https://yandex.ru/dev/oauth/?turbo=true){target="_blank"},
-- [Mail](https://api.mail.ru/docs/guides/oauth/){target="_blank"}.
+```shell
+docker-compose up -d
+```
 
-## Дополнительное задание
+После запуска docker-compose на локальной машине, cервисы доступны по следующим url:
+* [http://admin.local](http://admin.local) Admin Service
+* [http://api.local](http://api.local) (а также по умолчанию на 80 порту) Movies API
+* [http://auth.local](http://auth.local) Auth Service
 
-Реализуйте возможность открепить аккаунт в соцсети от личного кабинета. 
+## Описание сервисов
 
-Решение залейте в репозиторий текущего спринта и отправьте на ревью.
+### Movies API
+
+Основное API на FastAPI, предоставляющее информацию о фильмах.
+
+### Auth Service
+
+Сервис предоставляет возможность работы пользователю с личным кабинетом. Для реализиации аутентификации используется jwt подход.
+
+После запуска docker-compose методы API становятся доступны по базовому url `http://auth.local/`. Описание API в формате OpenAPI 2.0 можно найти по ссылке `http://auth.local/apidocs/`
+
+Сервис использует базу данных PostgreSQL из сервиса `auth_postgres` для хранения данных о пользователях, а также отдельную базу redis в сервисе `redis`, используюмую для хранения просроченных access_tokens.
+
+Для создания суперпользователя можно воспользоваться командой `flask command createsuperuser`.
+
+### Admin Service
+
+Django админ панель для работы с базой данных фильмов PostgreSQL.
