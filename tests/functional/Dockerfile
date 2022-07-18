@@ -19,4 +19,10 @@ RUN pip3 install -r requirements.txt --user --no-cache-dir --no-warn-script-loca
 COPY ./auth_api/requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt --user --no-cache-dir --no-warn-script-location
 
+# logging
+RUN mkdir /data/log
+RUN touch /data/log/access_print.log
+RUN touch /data/log/error_print.log
+RUN touch /data/log/output_print.log
+
 CMD [ "/bin/sh", "tests/functional/docker-entrypoint.sh" ]
