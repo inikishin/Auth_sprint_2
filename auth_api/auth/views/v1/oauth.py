@@ -46,7 +46,7 @@ def receive_verification_code():
     if user is None:
         user = user_service.create_user(
             email=user_info.get('default_email'),
-            password='123', # TODO Refactor
+            password='123', # TODO Сейчас хардкод, затем, после добавления сервиса уведомлений, отправка уведомления со сгенерированным паролем
             first_name=user_info.get('first_name'),
             last_name=user_info.get('last_name'),
         )
