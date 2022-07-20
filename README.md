@@ -1,6 +1,6 @@
 # Проектная работа 6 спринта
 
-[Ссылка на репозиторий](https://github.com/inikishin/Auth_sprint_1).
+[Ссылка на репозиторий](https://github.com/inikishin/Auth_sprint_2).
 
 ## Описание сервисов
 
