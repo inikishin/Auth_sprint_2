@@ -12,12 +12,15 @@ from auth.views.schemas import user_schema, login_input_schema,\
 from auth.utils.api_error_handling_wrapper import api_error_handling_wrapper
 from auth.utils.rbac import allow
 from auth.utils.opentelemetry_tracer import trace
+from auth.utils.rate_limits import limit_leaky_bucket
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @bp.route('/who', methods=['GET'])
 @allow(['admin', 'user'])
+@jwt_required()
+@limit_leaky_bucket
 def who():
     """Точка возвращает информацию залогинен ли пользователь
     ---

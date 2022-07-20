@@ -6,6 +6,7 @@ from auth.models import db
 from auth.services.users import UserService
 from auth.views.schemas import roles_schema, user_schema, users_schema, user_login_history_schema
 from auth.utils.api_error_handling_wrapper import api_error_handling_wrapper
+from auth.utils.rate_limits import limit_leaky_bucket
 from auth.utils.rbac import allow
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -142,6 +143,7 @@ class UsersAPI(MethodView):
 
 @bp.route('/<uuid:user_id>/roles', methods=['GET'])
 @api_error_handling_wrapper
+@limit_leaky_bucket
 @allow(['user', 'admin'])
 def get_user_roles(user_id):
     """Возвращает текущие роли пользователя
@@ -173,6 +175,7 @@ def get_user_roles(user_id):
 
 @bp.route('/<uuid:user_id>/login-history', methods=['GET'])
 @api_error_handling_wrapper
+@limit_leaky_bucket
 @allow(['user', 'admin'])
 def get_user_login_history(user_id):
     """Возвращает историю логинов пользователя
@@ -203,6 +206,7 @@ def get_user_login_history(user_id):
 
 @bp.route('/<uuid:user_id>/add-role', methods=['POST'])
 @api_error_handling_wrapper
+@limit_leaky_bucket
 @allow(['admin'])
 def add_role_to_user(user_id):
     """Добавляет роль пользователю
@@ -241,6 +245,7 @@ def add_role_to_user(user_id):
 
 @bp.route('/<uuid:user_id>/remove-role', methods=['POST'])
 @api_error_handling_wrapper
+@limit_leaky_bucket
 @allow(['admin'])
 def remove_role_from_user(user_id):
     """Удаляет роль пользователю
