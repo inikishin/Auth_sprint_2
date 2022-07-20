@@ -57,6 +57,19 @@ def upgrade() -> None:
     )
 
     op.create_table(
+        'user_oauth_refresh_token',
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True,
+                  default=uuid.uuid4,
+                  unique=True, nullable=False),
+        sa.Column('user_id', postgresql.UUID(as_uuid=True),
+                  sa.ForeignKey('users.id'),
+                  nullable=False),
+        sa.Column('provider', sa.String, nullable=True),
+        sa.Column('refresh_token', sa.String, nullable=True),
+        sa.Column('expires_in', sa.Integer, nullable=True),
+    )
+
+    op.create_table(
         'refresh_tokens',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True,
                   default=uuid.uuid4,
@@ -83,6 +96,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.drop_table('user_oauth_refresh_token')
     op.drop_table('user_login_history')
     op.drop_table('refresh_tokens')
     op.drop_table('user_roles')

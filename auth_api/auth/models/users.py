@@ -26,6 +26,7 @@ class User(Base):
 
     login_history = relationship('UserLoginHistory', back_populates='user')
     refresh_token = relationship('RefreshToken', back_populates='user')
+    oauth_refresh_tokens = relationship('UserOAuthRefreshToken', back_populates='user')
     roles = relationship('UserRole', back_populates='user')
 
     def __init__(self, password=None, **kwargs):
@@ -57,6 +58,21 @@ class UserLoginHistory(Base):
 
     def __repr__(self):
         return f'<UserLoginHistory: {self.id}>'
+
+
+class UserOAuthRefreshToken(Base):
+    __tablename__ = 'user_oauth_refresh_token'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4,
+                unique=True, nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
+    user = relationship('User', back_populates='oauth_refresh_tokens')
+    provider = Column(String, nullable=True)
+    refresh_token = Column(String, nullable=True)
+    expires_in = Column(Integer, nullable=True)
+
+    def __repr__(self):
+        return f'<UserOAuthRefreshToken: {self.id}>'
 
 
 class RefreshToken(Base):

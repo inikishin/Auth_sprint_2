@@ -53,6 +53,7 @@ from auth.views import v1
 app.register_blueprint(v1.authentication.bp)
 app.register_blueprint(v1.roles.bp)
 app.register_blueprint(v1.users.bp)
+app.register_blueprint(v1.oauth.bp)
 
 from auth import commands
 app.register_blueprint(commands.bp)

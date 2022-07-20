@@ -4,7 +4,8 @@ import uuid
 
 from sqlalchemy.orm import Session
 from werkzeug.exceptions import NotFound
-from auth.models.users import User, UserLoginHistory, UserRole
+from auth.models.users import User, UserLoginHistory, UserRole,\
+    UserOAuthRefreshToken
 from auth.services.roles import RoleService
 from auth.utils.http_query_helper import decode_pagination
 
@@ -26,6 +27,11 @@ class UserService:
             raise NotFound(f'User with id {user_id} not found')
 
         return user
+
+    def get_user_by_universal_email(self,
+                                    email: Optional[str] = None):
+        return self.db.query(User).filter(
+            User.email == email).first()
 
     def get_user_login_history(
             self,
@@ -134,3 +140,40 @@ class UserService:
             self.db.commit()
 
         return True
+
+    def get_user_oauth_refresh_token(self, user_id: str, provider: str):
+        token = (
+            self.db.query(UserOAuthRefreshToken)
+            .filter(UserOAuthRefreshToken.user_id == user_id,
+                    UserOAuthRefreshToken.provider == provider)
+            .first()
+        )
+
+        if token:
+            return token.refresh_token
+        else:
+            return None
+
+    def save_user_oauth_refresh_token(self,
+                                      user_id: str,
+                                      provider: str,
+                                      refresh_token: str,
+                                      expires_in: int):
+        existing_tokens = (
+            self.db.query(UserOAuthRefreshToken)
+            .filter(UserOAuthRefreshToken.user_id == user_id)
+            .all()
+        )
+
+        for existing_token in existing_tokens:
+            self.db.delete(existing_token)
+
+        new_token = UserOAuthRefreshToken(
+            user_id=user_id,
+            provider=provider,
+            refresh_token=refresh_token,
+            expires_in=expires_in,
+        )
+
+        self.db.add(new_token)
+        self.db.commit()

@@ -10,3 +10,4 @@ async_api/.env
 /.idea/
 /auth_api/.env.docker-compose
 /admin/.env.docker-compose
+/auth_api/log/
