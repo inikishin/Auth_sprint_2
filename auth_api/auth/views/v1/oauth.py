@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 
 from auth.models import db
+from auth.services.oauth import get_provider_service
 from auth.services.oauth.yandex import YandexOAuthService
 from auth.services.users import UserService
 from auth.utils.rbac import allow, current_identity
@@ -10,17 +11,20 @@ PROVIDER = 'yandex'
 bp = Blueprint('oauth', __name__, url_prefix='/oauth')
 
 
-@bp.route('/yandex/authorize-url', methods=['GET'])
-def get_authorize_url():
+@bp.route('/<str:provider>/authorize-url', methods=['GET'])
+def get_authorize_url(provider: str):
     """Возвращает url для авторизации."""
-    oauth_service = YandexOAuthService()
+    oauth_service = get_provider_service(provider)
+    if oauth_service is None:
+        return {'msg': 'Unknown provider'}, 400
+
     return {
         'authorize_url': oauth_service.get_authorize_url()
     }
 
 
-@bp.route('/yandex/webhook', methods=['GET'])
-def receive_verification_code():
+@bp.route('/<str:provider>/webhook', methods=['GET'])
+def receive_verification_code(provider: str):
     """Вебхук для редиректа после авторизации в яндексе."""
     verification_code = request.args.get('code', None)
     state = request.args.get('state', None)
@@ -28,7 +32,10 @@ def receive_verification_code():
     if verification_code is None:
         return {'msg': 'code not found in params'}
 
-    oauth_service = YandexOAuthService()
+    oauth_service = get_provider_service(provider)
+    if oauth_service is None:
+        return {'msg': 'Unknown provider'}, 400
+
     user_service = UserService(db)
     token_data = oauth_service.get_token(verification_code, state)
 
@@ -59,13 +66,16 @@ def receive_verification_code():
     return {'user_id': user.id}
 
 
-@bp.route('/yandex/who', methods=['GET'])
+@bp.route('/<str:provider>/who', methods=['GET'])
 @allow(['admin', 'user'])
-def get_user_info():
+def get_user_info(provider: str):
     """Ендпоинт возвращает информацию о пользователе с сервиса Yandex."""
     current_user = current_identity()
     user_service = UserService(db)
-    oauth_service = YandexOAuthService()
+
+    oauth_service = get_provider_service(provider)
+    if oauth_service is None:
+        return {'msg': 'Unknown provider'}, 400
 
     refresh_token = user_service.get_user_oauth_refresh_token(current_user.id,
                                                               PROVIDER)

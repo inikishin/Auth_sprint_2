@@ -1,9 +1,10 @@
 import requests
 
 from auth.config.settings import Settings
+from auth.services.oauth.base import OAuthService
 
 
-class YandexOAuthService:
+class YandexOAuthService(OAuthService):
     def __init__(self):
         self.client_id = Settings().oauth_yandex.client_id
         self.client_secret = Settings().oauth_yandex.client_secret
@@ -21,8 +22,7 @@ class YandexOAuthService:
 
         return authorize_url
 
-
-    def get_token(self, confirmation_code: str, state: str = None):
+    def get_token(self, confirmation_code: str, state: str = None) -> dict:
         """Обмен кода подтверждения на токен."""
         url = self.oauth_url + 'token'
         headers = {
@@ -46,7 +46,7 @@ class YandexOAuthService:
 
         return data
 
-    def refresh_token(self, refresh_token):
+    def refresh_token(self, refresh_token) -> dict:
         """Обновление токена через refresh_token."""
         url = self.oauth_url + 'token'
         headers = {
@@ -69,7 +69,7 @@ class YandexOAuthService:
 
         return data
 
-    def get_user_info(self, access_token):
+    def get_user_info(self, access_token) -> dict:
         """Запрос информации о пользователе."""
         url = self.login_url + 'info'
         headers = {
