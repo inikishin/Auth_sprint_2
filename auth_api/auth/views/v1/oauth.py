@@ -37,8 +37,7 @@ def receive_verification_code():
 
     user_info = oauth_service.get_user_info(
         access_token=token_data.get('access_token'))
-    print(token_data.get('access_token'))
-    print(user_info)
+
     user = user_service.get_user_by_universal_email(
         email=user_info.get('default_email'),
     )
@@ -70,9 +69,9 @@ def get_user_info():
 
     refresh_token = user_service.get_user_oauth_refresh_token(current_user.id,
                                                               PROVIDER)
-    print('refresh_token', refresh_token)
+
     data = oauth_service.refresh_token(refresh_token=refresh_token)
-    print('refresh_token_data', data)
+
     user_service.save_user_oauth_refresh_token(
         current_user.id,
         PROVIDER,
@@ -80,7 +79,6 @@ def get_user_info():
         data.get('expires_in'))
     user_info = oauth_service.get_user_info(
         access_token=data.get('access_token'))
-    print('user_info', user_info)
 
     if user_info is None:
         user_info = {'data': 'no data'}
