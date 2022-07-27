@@ -45,8 +45,27 @@ class User(Base):
         return f'<User {self.email} (id: {self.id})>'
 
 
+def create_partition(target, connection, **kw) -> None:
+    """ creating partition by user_sign_in """
+    connection.execute(
+        """CREATE TABLE IF NOT EXISTS "user_login_history_y2022" PARTITION OF "user_login_history" FOR VALUES FROM ('2022-01-01') TO ('2022-12-31')"""
+    )
+    connection.execute(
+        """CREATE TABLE IF NOT EXISTS "user_login_history_y2023" PARTITION OF "user_login_history" FOR VALUES FROM ('2023-01-01') TO ('2023-12-31')"""
+    )
+    connection.execute(
+        """CREATE TABLE IF NOT EXISTS "user_login_history_y2024" PARTITION OF "user_login_history" FOR VALUES FROM ('2024-01-01') TO ('2024-12-31')"""
+    )
+
+
 class UserLoginHistory(Base):
     __tablename__ = 'user_login_history'
+    __table_args__ = (
+        {
+            'postgresql_partition_by': 'RANGE (login_at)',
+            'listeners': [('after_create', create_partition)],
+        }
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4,
                 unique=True, nullable=False)

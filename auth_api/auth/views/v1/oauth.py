@@ -11,7 +11,7 @@ PROVIDER = 'yandex'
 bp = Blueprint('oauth', __name__, url_prefix='/oauth')
 
 
-@bp.route('/<str:provider>/authorize-url', methods=['GET'])
+@bp.route('/<provider>/authorize-url', methods=['GET'])
 def get_authorize_url(provider: str):
     """Возвращает url для авторизации."""
     oauth_service = get_provider_service(provider)
@@ -23,7 +23,7 @@ def get_authorize_url(provider: str):
     }
 
 
-@bp.route('/<str:provider>/webhook', methods=['GET'])
+@bp.route('/<provider>/webhook', methods=['GET'])
 def receive_verification_code(provider: str):
     """Вебхук для редиректа после авторизации в яндексе."""
     verification_code = request.args.get('code', None)
@@ -66,7 +66,7 @@ def receive_verification_code(provider: str):
     return {'user_id': user.id}
 
 
-@bp.route('/<str:provider>/who', methods=['GET'])
+@bp.route('/<provider>/who', methods=['GET'])
 @allow(['admin', 'user'])
 def get_user_info(provider: str):
     """Ендпоинт возвращает информацию о пользователе с сервиса Yandex."""
