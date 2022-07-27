@@ -30,4 +30,5 @@ def limit_leaky_bucket(func):
         else:
             return func()
 
+    limit_leaky_bucket_wrapper.__name__ = func.__name__
     return limit_leaky_bucket_wrapper
