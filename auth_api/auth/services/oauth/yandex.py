@@ -1,13 +1,14 @@
-import os
 import requests
+
+from auth.config.settings import Settings
 
 
 class YandexOAuthService:
     def __init__(self):
-        self.client_id = os.getenv('OAUTH_YANDEX_CLIENT_ID')
-        self.client_secret = os.getenv('OAUTH_YANDEX_CLIENT_SECRET')
-        self.oauth_url = 'https://oauth.yandex.ru/'
-        self.login_url = 'https://login.yandex.ru/'
+        self.client_id = Settings().oauth_yandex.client_id
+        self.client_secret = Settings().oauth_yandex.client_secret
+        self.oauth_url = Settings().oauth_yandex.oauth_url
+        self.login_url = Settings().oauth_yandex.login_url
 
     def get_authorize_url(self, state: str = None) -> str:
         """Формирование адреса для авторизации в яндексе"""
